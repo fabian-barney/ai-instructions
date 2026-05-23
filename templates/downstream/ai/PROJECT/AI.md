@@ -1,0 +1,18 @@
+# Project AI Context
+
+This file is the downstream project-owned AI context entrypoint.
+
+## Skill Profile
+
+- [SKILLS.yml](SKILLS.yml)
+
+## Project Knowledge
+
+- [Architecture decisions](DECISIONS/DECISIONS.md)
+- [Lessons learned](LESSONS_LEARNED/LESSONS_LEARNED.md)
+- [Development specs](SPECS/SPECS.md)
+
+## Local Guidance
+
+Add only project-specific context here. Reusable behavior should stay in shared
+`ai-skills` and be selected through `SKILLS.yml`.
