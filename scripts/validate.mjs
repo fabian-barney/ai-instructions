@@ -184,7 +184,7 @@ function validateEntrypointTemplates() {
 function parseSkillsManifest(content) {
   const lines = content
     .split(/\r?\n/)
-    .map(line => line.replace(/\s+#.*$/, ''))
+    .map(line => (line.trimStart().startsWith('#') ? '' : line.replace(/\s+#.*$/, '')))
     .filter(line => line.trim().length > 0);
 
   const manifest = {
