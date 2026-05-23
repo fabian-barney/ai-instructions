@@ -73,6 +73,19 @@ function walk(directory, predicate = () => true) {
   return results.sort();
 }
 
+function childDirectories(directory) {
+  const absolute = path.join(root, directory);
+  if (!fs.existsSync(absolute)) {
+    return [];
+  }
+
+  return fs
+    .readdirSync(absolute, { withFileTypes: true })
+    .filter(entry => entry.isDirectory())
+    .map(entry => entry.name)
+    .sort();
+}
+
 function normalizeLink(sourceFile, target) {
   const withoutFragment = target.split('#')[0];
   if (
@@ -83,9 +96,22 @@ function normalizeLink(sourceFile, target) {
     return null;
   }
 
-  return path
-    .normalize(path.join(path.dirname(sourceFile), withoutFragment))
-    .replaceAll(path.sep, '/');
+  const normalizedTarget = withoutFragment.replaceAll('\\', '/');
+  const sourceDirectory = path.dirname(sourceFile).replaceAll(path.sep, '/');
+  const candidate = normalizedTarget.startsWith('/')
+    ? normalizedTarget.slice(1)
+    : path.posix.join(sourceDirectory, normalizedTarget);
+  const resolved = path.posix.normalize(candidate);
+
+  if (resolved === '..' || resolved.startsWith('../') || path.isAbsolute(resolved)) {
+    return {
+      error: `Link target escapes the repository root: ${target}`
+    };
+  }
+
+  return {
+    path: resolved
+  };
 }
 
 function markdownLinks(content) {
@@ -108,8 +134,10 @@ function validateRequiredFiles() {
 }
 
 function validateNoSelfHostedProject() {
-  if (exists('ai/PROJECT')) {
-    errors.push('Repository must not contain root-level ai/PROJECT self-context.');
+  for (const directory of childDirectories('ai')) {
+    if (directory.toLowerCase() === 'project') {
+      errors.push(`Repository must not contain root-level ai/PROJECT self-context: ai/${directory}`);
+    }
   }
 }
 
@@ -121,8 +149,14 @@ function validateNoGeminiSupport() {
 }
 
 function validateNoLargeRuleTree() {
+  const forbiddenNames = new Set(forbiddenRootDirs.map(directory => directory.toLowerCase()));
   for (const directory of forbiddenRootDirs) {
     if (exists(directory)) {
+      errors.push(`Large rule-tree directory is not allowed at repository root: ${directory}`);
+    }
+  }
+  for (const directory of childDirectories('.')) {
+    if (forbiddenNames.has(directory.toLowerCase()) && !forbiddenRootDirs.includes(directory)) {
       errors.push(`Large rule-tree directory is not allowed at repository root: ${directory}`);
     }
   }
@@ -240,9 +274,13 @@ function validateMarkdownLinks() {
     const content = read(file);
     for (const link of markdownLinks(content)) {
       const resolved = normalizeLink(file, link);
+      if (resolved?.error) {
+        errors.push(`Invalid Markdown link in ${file}: ${resolved.error}`);
+        continue;
+      }
       const isVirtualSharedEntrypoint =
-        resolved === 'templates/downstream/ai/AI-INSTRUCTIONS/AI.md' && exists('AI.md');
-      if (resolved && !exists(resolved) && !isVirtualSharedEntrypoint) {
+        resolved?.path === 'templates/downstream/ai/AI-INSTRUCTIONS/AI.md' && exists('AI.md');
+      if (resolved && !exists(resolved.path) && !isVirtualSharedEntrypoint) {
         errors.push(`Broken Markdown link in ${file}: ${link}`);
       }
     }
@@ -269,8 +307,8 @@ function validateProjectTemplateReachability() {
     reachable.add(current);
     for (const link of markdownLinks(read(current))) {
       const resolved = normalizeLink(current, link);
-      if (resolved && inScope.has(resolved) && !reachable.has(resolved)) {
-        queue.push(resolved);
+      if (resolved?.path && inScope.has(resolved.path) && !reachable.has(resolved.path)) {
+        queue.push(resolved.path);
       }
     }
   }
