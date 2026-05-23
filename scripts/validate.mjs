@@ -79,6 +79,11 @@ function childDirectories(directory) {
     return [];
   }
 
+  if (!fs.statSync(absolute).isDirectory()) {
+    errors.push(`Expected directory but found non-directory path: ${directory}`);
+    return [];
+  }
+
   return fs
     .readdirSync(absolute, { withFileTypes: true })
     .filter(entry => entry.isDirectory())
