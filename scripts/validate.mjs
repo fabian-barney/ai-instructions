@@ -43,6 +43,8 @@ const forbiddenRootDirs = [
   'TEST'
 ];
 
+const disabledIdentifierPattern = /^[a-z0-9-]+$/;
+
 function exists(relativePath) {
   return fs.existsSync(path.join(root, relativePath));
 }
@@ -218,21 +220,21 @@ function parseSkillsManifest(content) {
       continue;
     }
 
-    const inlineListMatch = line.match(/^    (enabled|disabled):\s*\[\]\s*$/);
+    const inlineListMatch = line.match(/^    ([A-Za-z0-9_-]+):\s*\[\]\s*$/);
     if (currentProfile && inlineListMatch) {
       manifest.profiles[currentProfile][inlineListMatch[1]] = [];
       currentList = null;
       continue;
     }
 
-    const listMatch = line.match(/^    (enabled|disabled):\s*$/);
+    const listMatch = line.match(/^    ([A-Za-z0-9_-]+):\s*$/);
     if (currentProfile && listMatch) {
       currentList = listMatch[1];
       manifest.profiles[currentProfile][currentList] = [];
       continue;
     }
 
-    const itemMatch = line.match(/^      -\s*(ai-skills-[a-z0-9-]+)\s*$/);
+    const itemMatch = line.match(/^      -\s*(\S+)\s*$/);
     if (currentProfile && currentList && itemMatch) {
       manifest.profiles[currentProfile][currentList].push(itemMatch[1]);
       continue;
@@ -262,11 +264,33 @@ function validateSkillsManifest() {
       errors.push('SKILLS.yml active_profile must exist in profiles.');
     }
     for (const [name, profile] of Object.entries(manifest.profiles)) {
-      if (!Array.isArray(profile.enabled)) {
-        errors.push(`Profile ${name} must define enabled as a list.`);
+      for (const key of Object.keys(profile)) {
+        if (key !== 'disabled') {
+          errors.push(`Profile ${name} must not define ${key}.`);
+        }
       }
       if (!Array.isArray(profile.disabled)) {
         errors.push(`Profile ${name} must define disabled as a list.`);
+      }
+      if (Array.isArray(profile.disabled)) {
+        for (const identifier of profile.disabled) {
+          if (!disabledIdentifierPattern.test(identifier)) {
+            errors.push(
+              `Profile ${name} has invalid disabled identifier ${identifier}.`
+            );
+            continue;
+          }
+          if (identifier.length < 1 || identifier.length > 64) {
+            errors.push(
+              `Profile ${name} has disabled identifier outside 1-64 characters: ${identifier}.`
+            );
+          }
+          if (identifier.startsWith('-') || identifier.endsWith('-')) {
+            errors.push(
+              `Profile ${name} has disabled identifier with invalid edge hyphen: ${identifier}.`
+            );
+          }
+        }
       }
     }
   } catch (error) {

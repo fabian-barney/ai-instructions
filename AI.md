@@ -15,7 +15,8 @@ When working in a downstream repository:
 
 ## Responsibilities
 
-- Keep reusable behavior in shared `ai-skills`.
+- Keep reusable behavior in shared reusable skill catalogs or instruction
+  libraries.
 - Keep project-owned context in `ai/PROJECT`.
 - Use `ai/PROJECT/SKILLS.yml` to identify the active skill profile.
 - Treat `ai/PROJECT/DECISIONS` as the downstream ADR area.
@@ -26,9 +27,9 @@ When working in a downstream repository:
 
 For the active profile in `ai/PROJECT/SKILLS.yml`:
 
-- `enabled` lists skills that should be considered default candidates.
 - `disabled` lists skills that should not be used unless the user explicitly
   asks for them.
+- unlisted skills remain available by default.
 
 This file does not install or define those skills. It only points agents at the
 downstream project's selection.
@@ -37,5 +38,5 @@ downstream project's selection.
 
 Do not copy global conventions, correctness checks, review workflows, release
 workflows, or other reusable behavior into the downstream project. Prefer
-referencing existing `ai-skills` and keep only project-specific context in
-`ai/PROJECT`.
+referencing existing shared reusable behavior and keep only project-specific
+context in `ai/PROJECT`.

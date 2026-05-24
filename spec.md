@@ -110,7 +110,8 @@ ai/PROJECT/SPECS/SPECS.md
 Their roles are:
 
 - `AI.md`: local project context index for agents
-- `SKILLS.yml`: lightweight profile selection for reusable `ai-skills`
+- `SKILLS.yml`: lightweight profile selection for reusable skills or
+  capabilities
 - `DECISIONS/`: downstream architecture decision records
 - `LESSONS_LEARNED/`: downstream recurring lessons and project experience
 - `SPECS/`: downstream specs for AI-agent-driven development work
@@ -129,18 +130,19 @@ version: 1
 active_profile: default
 profiles:
   default:
-    enabled:
-      - ai-skills-plan
     disabled: []
 ```
 
 Rules:
 
-- skill ids should use canonical `ai-skills-*` names
 - the active profile names the profile agents should apply by default
-- `enabled` lists default skill candidates for the active profile
+- each profile defines only `disabled`
 - `disabled` lists skills agents must not use unless the user explicitly asks
   for them
+- disabled identifiers must:
+  - use lowercase letters, numbers, and hyphens only
+  - be between 1 and 64 characters
+  - not start or end with `-`
 - missing or unknown skills are not installed by `ai-instructions`
 
 This is an agent-readable manifest, not a resolver engine. It does not install
