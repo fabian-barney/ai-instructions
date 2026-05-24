@@ -2,6 +2,4 @@ version: 1
 active_profile: default
 profiles:
   default:
-    enabled:
-      - ai-skills-plan
     disabled: []

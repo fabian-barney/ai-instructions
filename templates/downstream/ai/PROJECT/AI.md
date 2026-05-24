@@ -15,4 +15,4 @@ This file is the downstream project-owned AI context entrypoint.
 ## Local Guidance
 
 Add only project-specific context here. Reusable behavior should stay in shared
-`ai-skills` and be selected through `SKILLS.yml`.
+skill catalogs or instruction libraries and be filtered through `SKILLS.yml`.
