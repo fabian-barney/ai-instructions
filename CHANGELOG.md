@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.1.0 - Unreleased
+## v0.1.0 - 2026-05-25
 
 - Define `ai-instructions` as a tiny downstream-only instruction layer.
 - Add shared downstream entrypoint `AI.md`.

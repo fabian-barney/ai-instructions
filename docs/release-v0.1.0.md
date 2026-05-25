@@ -38,5 +38,7 @@ git subtree pull --prefix "ai/AI-INSTRUCTIONS" https://github.com/fabian-barney/
 ## Release
 
 - Update [CHANGELOG.md](../CHANGELOG.md).
+- Update `package.json` `version` to `0.1.0` in the same release-preparation
+  change.
 - Tag the release as `v0.1.0`.
 - Push the tag after validation and rehearsal pass.
