@@ -1,0 +1,27 @@
+name: Feature request
+description: Propose a focused improvement to ai-instructions.
+title: "Feature: "
+labels:
+  - documentation
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What gap are you trying to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed shape
+      description: Describe the change you want.
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Boundary alignment
+      description: How does this stay within the repository boundary from spec.md?
+    validations:
+      required: true
