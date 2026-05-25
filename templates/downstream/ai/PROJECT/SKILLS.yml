@@ -1,5 +1,0 @@
-version: 1
-active_profile: default
-profiles:
-  default:
-    disabled: []

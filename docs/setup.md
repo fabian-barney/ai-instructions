@@ -62,7 +62,7 @@ Run setup from the downstream repository root.
    Copy-Item ai/AI-INSTRUCTIONS/templates/downstream/ai/PROJECT/* ai/PROJECT/ -Recurse
    ```
 
-5. Edit `ai/PROJECT/AI.md` and `ai/PROJECT/SKILLS.yml` for the downstream
+5. Edit `ai/PROJECT/AI.md` and `ai/PROJECT/SKILLS.json` for the downstream
    project.
 
 6. Commit the subtree and downstream-owned files together or in separate

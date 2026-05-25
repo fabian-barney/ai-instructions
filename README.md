@@ -28,7 +28,7 @@ ai/
 |   `-- AI.md
 `-- PROJECT/
     |-- AI.md
-    |-- SKILLS.yml
+    |-- SKILLS.json
     |-- DECISIONS/
     |-- LESSONS_LEARNED/
     `-- SPECS/
@@ -48,7 +48,7 @@ commands.
 - [docs/downstream-contract.md](docs/downstream-contract.md) defines the
   downstream file layout.
 - [docs/skill-profiles.md](docs/skill-profiles.md) defines the lightweight
-  `SKILLS.yml` profile manifest.
+  `SKILLS.json` profile manifest.
 
 ## Validation
 

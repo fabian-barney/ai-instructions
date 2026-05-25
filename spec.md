@@ -101,7 +101,7 @@ Required or recommended downstream files are:
 
 ```text
 ai/PROJECT/AI.md
-ai/PROJECT/SKILLS.yml
+ai/PROJECT/SKILLS.json
 ai/PROJECT/DECISIONS/DECISIONS.md
 ai/PROJECT/LESSONS_LEARNED/LESSONS_LEARNED.md
 ai/PROJECT/SPECS/SPECS.md
@@ -110,7 +110,7 @@ ai/PROJECT/SPECS/SPECS.md
 Their roles are:
 
 - `AI.md`: local project context index for agents
-- `SKILLS.yml`: lightweight profile selection for reusable skills or
+- `SKILLS.json`: lightweight profile selection for reusable skills or
   capabilities
 - `DECISIONS/`: downstream architecture decision records
 - `LESSONS_LEARNED/`: downstream recurring lessons and project experience
@@ -121,16 +121,20 @@ Every Markdown file under `ai/PROJECT/` should be transitively reachable from
 
 ## Lightweight Skill Profiles
 
-Downstream repositories select reusable skills through `ai/PROJECT/SKILLS.yml`.
+Downstream repositories select reusable skills through `ai/PROJECT/SKILLS.json`.
 
 The v0.1.0 manifest shape is:
 
-```yaml
-version: 1
-active_profile: default
-profiles:
-  default:
-    disabled: []
+```json
+{
+  "version": 1,
+  "active_profile": "default",
+  "profiles": {
+    "default": {
+      "disabled": []
+    }
+  }
+}
 ```
 
 Rules:

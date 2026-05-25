@@ -16,7 +16,7 @@ const requiredFiles = [
   'templates/downstream/CLAUDE.md',
   'templates/downstream/.github/copilot-instructions.md',
   'templates/downstream/ai/PROJECT/AI.md',
-  'templates/downstream/ai/PROJECT/SKILLS.yml',
+  'templates/downstream/ai/PROJECT/SKILLS.json',
   'templates/downstream/ai/PROJECT/DECISIONS/DECISIONS.md',
   'templates/downstream/ai/PROJECT/DECISIONS/ADR-0001-template.md',
   'templates/downstream/ai/PROJECT/LESSONS_LEARNED/LESSONS_LEARNED.md',
@@ -183,71 +183,44 @@ function validateEntrypointTemplates() {
   }
 }
 
+function getLineAndColumn(content, offset) {
+  const beforeOffset = content.slice(0, offset);
+  const lines = beforeOffset.split(/\r?\n/);
+  const line = lines.length;
+  const column = (lines.at(-1) ?? '').length + 1;
+  return { line, column };
+}
+
+function formatJsonParseError(content, error) {
+  const positionMatch = error.message.match(/position (\d+)/);
+  const baseMessage = error.message.replace(/\s+at position \d+.*$/, '');
+  if (!positionMatch) {
+    return baseMessage;
+  }
+
+  const position = Number(positionMatch[1]);
+  const { line, column } = getLineAndColumn(content, position);
+  const lineText = content.split(/\r?\n/)[line - 1] ?? '';
+  return `${baseMessage} at line ${line}, column ${column}: ${lineText}`;
+}
+
 function parseSkillsManifest(content) {
-  const lines = content
-    .split(/\r?\n/)
-    .map(line => (line.trimStart().startsWith('#') ? '' : line.replace(/\s+#.*$/, '')))
-    .filter(line => line.trim().length > 0);
+  let manifest;
+  try {
+    manifest = JSON.parse(content);
+  } catch (error) {
+    throw new Error(formatJsonParseError(content, error));
+  }
 
-  const manifest = {
-    profiles: {}
-  };
-  let section = null;
-  let currentProfile = null;
-  let currentList = null;
-
-  for (const line of lines) {
-    if (/^version:\s*(\d+)\s*$/.test(line)) {
-      manifest.version = Number(line.match(/^version:\s*(\d+)\s*$/)[1]);
-      continue;
-    }
-
-    if (/^active_profile:\s*([A-Za-z0-9_-]+)\s*$/.test(line)) {
-      manifest.active_profile = line.match(/^active_profile:\s*([A-Za-z0-9_-]+)\s*$/)[1];
-      continue;
-    }
-
-    if (/^profiles:\s*$/.test(line)) {
-      section = 'profiles';
-      continue;
-    }
-
-    const profileMatch = line.match(/^  ([A-Za-z0-9_-]+):\s*$/);
-    if (section === 'profiles' && profileMatch) {
-      currentProfile = profileMatch[1];
-      manifest.profiles[currentProfile] = {};
-      currentList = null;
-      continue;
-    }
-
-    const inlineListMatch = line.match(/^    ([A-Za-z0-9_-]+):\s*\[\]\s*$/);
-    if (currentProfile && inlineListMatch) {
-      manifest.profiles[currentProfile][inlineListMatch[1]] = [];
-      currentList = null;
-      continue;
-    }
-
-    const listMatch = line.match(/^    ([A-Za-z0-9_-]+):\s*$/);
-    if (currentProfile && listMatch) {
-      currentList = listMatch[1];
-      manifest.profiles[currentProfile][currentList] = [];
-      continue;
-    }
-
-    const itemMatch = line.match(/^      -\s*(\S+)\s*$/);
-    if (currentProfile && currentList && itemMatch) {
-      manifest.profiles[currentProfile][currentList].push(itemMatch[1]);
-      continue;
-    }
-
-    throw new Error(`Unsupported SKILLS.yml line: ${line}`);
+  if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
+    throw new Error('SKILLS.json must be a top-level JSON object.');
   }
 
   return manifest;
 }
 
 function validateSkillsManifest() {
-  const manifestPath = 'templates/downstream/ai/PROJECT/SKILLS.yml';
+  const manifestPath = 'templates/downstream/ai/PROJECT/SKILLS.json';
   if (!exists(manifestPath)) {
     return;
   }
@@ -255,15 +228,23 @@ function validateSkillsManifest() {
   try {
     const manifest = parseSkillsManifest(read(manifestPath));
     if (manifest.version !== 1) {
-      errors.push('SKILLS.yml version must be 1.');
+      errors.push('SKILLS.json version must be 1.');
     }
-    if (!manifest.active_profile) {
-      errors.push('SKILLS.yml must define active_profile.');
+    if (typeof manifest.active_profile !== 'string' || manifest.active_profile.length === 0) {
+      errors.push('SKILLS.json must define active_profile as a non-empty string.');
     }
-    if (!manifest.profiles[manifest.active_profile]) {
-      errors.push('SKILLS.yml active_profile must exist in profiles.');
+    if (!manifest.profiles || typeof manifest.profiles !== 'object' || Array.isArray(manifest.profiles)) {
+      errors.push('SKILLS.json must define profiles as an object.');
+      return;
+    }
+    if (!Object.hasOwn(manifest.profiles, manifest.active_profile)) {
+      errors.push('SKILLS.json active_profile must exist in profiles.');
     }
     for (const [name, profile] of Object.entries(manifest.profiles)) {
+      if (!profile || typeof profile !== 'object' || Array.isArray(profile)) {
+        errors.push(`Profile ${name} must be a JSON object.`);
+        continue;
+      }
       for (const key of Object.keys(profile)) {
         if (key !== 'disabled') {
           errors.push(`Profile ${name} must not define ${key}.`);
@@ -294,7 +275,7 @@ function validateSkillsManifest() {
       }
     }
   } catch (error) {
-    errors.push(`SKILLS.yml parse failed: ${error.message}`);
+    errors.push(`SKILLS.json parse failed: ${error.message}`);
   }
 }
 

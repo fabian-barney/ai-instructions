@@ -1,16 +1,20 @@
 # Skill Profiles
 
-Downstream repositories use `ai/PROJECT/SKILLS.yml` to describe which reusable
+Downstream repositories use `ai/PROJECT/SKILLS.json` to describe which reusable
 skills or capabilities should be disabled for AI-agent work.
 
 ## Manifest Shape
 
-```yaml
-version: 1
-active_profile: default
-profiles:
-  default:
-    disabled: []
+```json
+{
+  "version": 1,
+  "active_profile": "default",
+  "profiles": {
+    "default": {
+      "disabled": []
+    }
+  }
+}
 ```
 
 ## Semantics
@@ -30,7 +34,7 @@ Disabled identifiers must:
 
 ## Limits
 
-`SKILLS.yml` is intentionally lightweight. It does not:
+`SKILLS.json` is intentionally lightweight. It does not:
 
 - install skills
 - validate whether skills exist
