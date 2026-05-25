@@ -36,6 +36,13 @@ Each root entrypoint must point to:
 ai/AI-INSTRUCTIONS/AI.md
 ```
 
+Use the agent-specific pointer form from the bundled template:
+
+- `AGENTS.md` must include a Markdown link to `ai/AI-INSTRUCTIONS/AI.md`.
+- `CLAUDE.md` must contain a standalone `@ai/AI-INSTRUCTIONS/AI.md` line.
+- `.github/copilot-instructions.md` must include a Markdown link to
+  `../ai/AI-INSTRUCTIONS/AI.md`.
+
 No Gemini entrypoint is part of v0.1.0.
 
 ## Project-Owned Files

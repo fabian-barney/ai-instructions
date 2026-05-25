@@ -320,16 +320,31 @@ function validateNoLargeRuleTree() {
 }
 
 function validateEntrypointTemplates() {
-  const templates = [
-    'templates/downstream/AGENTS.md',
-    'templates/downstream/CLAUDE.md',
-    'templates/downstream/.github/copilot-instructions.md'
+  const markdownTemplates = [
+    {
+      path: 'templates/downstream/AGENTS.md',
+      target: 'ai/AI-INSTRUCTIONS/AI.md'
+    },
+    {
+      path: 'templates/downstream/.github/copilot-instructions.md',
+      target: '../ai/AI-INSTRUCTIONS/AI.md'
+    }
   ];
 
-  for (const template of templates) {
-    if (exists(template) && !read(template).includes('ai/AI-INSTRUCTIONS/AI.md')) {
-      errors.push(`${template} must point to ai/AI-INSTRUCTIONS/AI.md.`);
+  for (const template of markdownTemplates) {
+    if (exists(template.path) && !markdownLinks(read(template.path)).includes(template.target)) {
+      errors.push(`${template.path} must include a Markdown link to ${template.target}.`);
     }
+  }
+
+  const claudeTemplate = 'templates/downstream/CLAUDE.md';
+  if (
+    exists(claudeTemplate) &&
+    !read(claudeTemplate)
+      .split(/\r?\n/)
+      .some(line => line.trim() === '@ai/AI-INSTRUCTIONS/AI.md')
+  ) {
+    errors.push(`${claudeTemplate} must contain a standalone @ai/AI-INSTRUCTIONS/AI.md line.`);
   }
 }
 
