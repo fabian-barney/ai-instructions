@@ -1,7 +1,7 @@
 {
   "name": "ai-instructions",
   "description": "Tiny installable AI instruction layer for downstream repositories.",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "license": "Apache-2.0",
   "repository": {
