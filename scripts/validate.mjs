@@ -53,6 +53,18 @@ function read(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), 'utf8');
 }
 
+function shouldDescend(entryName) {
+  if (entryName === '.github') {
+    return true;
+  }
+
+  if (entryName.startsWith('.')) {
+    return false;
+  }
+
+  return !['build', 'coverage', 'dist', 'node_modules'].includes(entryName);
+}
+
 function walk(directory, predicate = () => true) {
   const absolute = path.join(root, directory);
   if (!fs.existsSync(absolute)) {
@@ -64,7 +76,7 @@ function walk(directory, predicate = () => true) {
     const absoluteEntry = path.join(absolute, entry.name);
     const relativeEntry = path.relative(root, absoluteEntry).replaceAll(path.sep, '/');
     if (entry.isDirectory()) {
-      if (['.git', 'node_modules'].includes(entry.name)) {
+      if (!shouldDescend(entry.name)) {
         continue;
       }
       results.push(...walk(relativeEntry, predicate));
