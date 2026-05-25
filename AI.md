@@ -25,6 +25,9 @@ When working in a downstream repository:
 
 ## Skill Profile Semantics
 
+The active profile is the one named by the `active_profile` field of
+`ai/PROJECT/SKILLS.json`.
+
 For the active profile in `ai/PROJECT/SKILLS.json`:
 
 - `disabled` lists skills that should not be used unless the user explicitly
