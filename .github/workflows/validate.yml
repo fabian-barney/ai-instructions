@@ -20,3 +20,6 @@ jobs:
 
       - name: Run validator
         run: npm run validate
+
+      - name: Run tests
+        run: npm test
