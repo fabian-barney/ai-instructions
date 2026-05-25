@@ -43,6 +43,7 @@ This repository must not contain a root-level downstream self-context tree such
 as:
 
 ```text
+ai/AI-INSTRUCTIONS/
 ai/PROJECT/
 ```
 

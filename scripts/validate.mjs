@@ -140,10 +140,13 @@ function validateRequiredFiles() {
   }
 }
 
-function validateNoSelfHostedProject() {
+function validateNoSelfHostedDownstream() {
   for (const directory of childDirectories('ai')) {
-    if (directory.toLowerCase() === 'project') {
-      errors.push(`Repository must not contain root-level ai/PROJECT self-context: ai/${directory}`);
+    const normalized = directory.toLowerCase();
+    if (normalized === 'project' || normalized === 'ai-instructions') {
+      errors.push(
+        `Repository must not self-host the downstream contract at ai/${directory}; see spec.md "No Self-Hosting".`
+      );
     }
   }
 }
@@ -340,7 +343,7 @@ function validateProjectTemplateReachability() {
 }
 
 validateRequiredFiles();
-validateNoSelfHostedProject();
+validateNoSelfHostedDownstream();
 validateNoGeminiSupport();
 validateNoLargeRuleTree();
 validateEntrypointTemplates();
