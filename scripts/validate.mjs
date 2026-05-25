@@ -160,13 +160,8 @@ function validateNoGeminiSupport() {
 
 function validateNoLargeRuleTree() {
   const forbiddenNames = new Set(forbiddenRootDirs.map(directory => directory.toLowerCase()));
-  for (const directory of forbiddenRootDirs) {
-    if (exists(directory)) {
-      errors.push(`Large rule-tree directory is not allowed at repository root: ${directory}`);
-    }
-  }
   for (const directory of childDirectories('.')) {
-    if (forbiddenNames.has(directory.toLowerCase()) && !forbiddenRootDirs.includes(directory)) {
+    if (forbiddenNames.has(directory.toLowerCase())) {
       errors.push(`Large rule-tree directory is not allowed at repository root: ${directory}`);
     }
   }
