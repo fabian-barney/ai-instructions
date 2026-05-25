@@ -1,7 +1,20 @@
 {
   "name": "ai-instructions",
+  "description": "Tiny installable AI instruction layer for downstream repositories.",
   "version": "0.0.0",
   "private": true,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabian-barney/ai-instructions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fabian-barney/ai-instructions/issues"
+  },
+  "homepage": "https://github.com/fabian-barney/ai-instructions#readme",
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "scripts": {
     "validate": "node scripts/validate.mjs"
