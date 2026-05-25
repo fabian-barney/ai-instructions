@@ -51,6 +51,8 @@ Run setup from the downstream repository root.
    cp -R ai/AI-INSTRUCTIONS/templates/downstream/ai/PROJECT/. ai/PROJECT/
    ```
 
+   Copy the project template directory including dotfiles.
+
    On Windows PowerShell:
 
    ```powershell
@@ -59,7 +61,7 @@ Run setup from the downstream repository root.
    New-Item -ItemType Directory -Force .github | Out-Null
    Copy-Item ai/AI-INSTRUCTIONS/templates/downstream/.github/copilot-instructions.md .github/copilot-instructions.md
    New-Item -ItemType Directory -Force ai/PROJECT | Out-Null
-   Copy-Item ai/AI-INSTRUCTIONS/templates/downstream/ai/PROJECT/* ai/PROJECT/ -Recurse
+   Copy-Item ai/AI-INSTRUCTIONS/templates/downstream/ai/PROJECT/. ai/PROJECT/ -Recurse -Force
    ```
 
 5. Edit `ai/PROJECT/AI.md` and `ai/PROJECT/SKILLS.json` for the downstream
