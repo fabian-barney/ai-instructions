@@ -26,6 +26,14 @@ skills or capabilities should be disabled for AI-agent work.
   asks for them.
 - unlisted skills remain available by default.
 
+## Identifier Rules
+
+Profile names must:
+
+- use lowercase letters, numbers, and hyphens only
+- be between 1 and 64 characters
+- not start or end with `-`
+
 Disabled identifiers must:
 
 - use lowercase letters, numbers, and hyphens only
