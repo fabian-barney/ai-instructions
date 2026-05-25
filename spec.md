@@ -140,6 +140,10 @@ The v0.1.0 manifest shape is:
 Rules:
 
 - the active profile names the profile agents should apply by default
+- profile names must:
+  - use lowercase letters, numbers, and hyphens only
+  - be between 1 and 64 characters
+  - not start or end with `-`
 - each profile defines only `disabled`
 - `disabled` lists skills agents must not use unless the user explicitly asks
   for them

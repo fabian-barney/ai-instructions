@@ -43,7 +43,7 @@ const forbiddenRootDirs = [
   'TEST'
 ];
 
-const disabledIdentifierPattern = /^[a-z0-9-]+$/;
+const manifestIdentifierPattern = /^[a-z0-9-]+$/;
 
 function exists(relativePath) {
   return fs.existsSync(path.join(root, relativePath));
@@ -241,6 +241,15 @@ function validateSkillsManifest() {
       errors.push('SKILLS.json active_profile must exist in profiles.');
     }
     for (const [name, profile] of Object.entries(manifest.profiles)) {
+      if (!manifestIdentifierPattern.test(name)) {
+        errors.push(`Profile name must use lowercase letters, numbers, and hyphens only: ${name}.`);
+      }
+      if (name.length < 1 || name.length > 64) {
+        errors.push(`Profile name must be between 1 and 64 characters: ${name}.`);
+      }
+      if (name.startsWith('-') || name.endsWith('-')) {
+        errors.push(`Profile name must not start or end with a hyphen: ${name}.`);
+      }
       if (!profile || typeof profile !== 'object' || Array.isArray(profile)) {
         errors.push(`Profile ${name} must be a JSON object.`);
         continue;
@@ -255,7 +264,7 @@ function validateSkillsManifest() {
       }
       if (Array.isArray(profile.disabled)) {
         for (const identifier of profile.disabled) {
-          if (!disabledIdentifierPattern.test(identifier)) {
+          if (!manifestIdentifierPattern.test(identifier)) {
             errors.push(
               `Profile ${name} has invalid disabled identifier ${identifier}.`
             );
