@@ -121,13 +121,165 @@ function normalizeLink(sourceFile, target) {
   };
 }
 
+function normalizeReferenceLabel(label) {
+  return label.trim().replaceAll(/\s+/g, ' ').toLowerCase();
+}
+
+function readBracketedText(content, startIndex) {
+  if (content[startIndex] !== '[') {
+    return null;
+  }
+
+  let index = startIndex + 1;
+  let value = '';
+  while (index < content.length) {
+    const character = content[index];
+    if (character === '\\' && index + 1 < content.length) {
+      value += content[index + 1];
+      index += 2;
+      continue;
+    }
+    if (character === ']') {
+      return { value, nextIndex: index + 1 };
+    }
+    value += character;
+    index += 1;
+  }
+
+  return null;
+}
+
+function readLinkTarget(text) {
+  const trimmed = text.trimStart();
+  if (trimmed.length === 0) {
+    return null;
+  }
+
+  if (trimmed.startsWith('<')) {
+    const endIndex = trimmed.indexOf('>');
+    if (endIndex === -1) {
+      return null;
+    }
+    return trimmed.slice(1, endIndex);
+  }
+
+  let target = '';
+  let depth = 0;
+  for (const character of trimmed) {
+    if (/\s/.test(character) && depth === 0) {
+      break;
+    }
+    if (character === '(') {
+      depth += 1;
+    } else if (character === ')') {
+      if (depth === 0) {
+        break;
+      }
+      depth -= 1;
+    }
+    target += character;
+  }
+
+  return target.length === 0 ? null : target;
+}
+
+function referenceLinkDefinitions(content) {
+  const definitions = new Map();
+  for (const line of content.split(/\r?\n/)) {
+    const match = line.match(/^\s{0,3}\[([^\]]+)\]:\s*(.+?)\s*$/);
+    if (!match) {
+      continue;
+    }
+
+    const target = readLinkTarget(match[2]);
+    if (target) {
+      definitions.set(normalizeReferenceLabel(match[1]), target);
+    }
+  }
+  return definitions;
+}
+
 function markdownLinks(content) {
   const links = [];
-  const linkPattern = /(?<!!)\[[^\]]*]\(([^)]+)\)/g;
-  for (const match of content.matchAll(linkPattern)) {
-    const rawTarget = match[1].trim();
-    const target = rawTarget.split(/\s+/)[0].replace(/^<|>$/g, '');
-    links.push(target);
+  const definitions = referenceLinkDefinitions(content);
+
+  for (let index = 0; index < content.length; index += 1) {
+    if (content[index] !== '[' || content[index - 1] === '!') {
+      continue;
+    }
+
+    const linkText = readBracketedText(content, index);
+    if (!linkText) {
+      continue;
+    }
+
+    const nextCharacter = content[linkText.nextIndex];
+    if (nextCharacter === '(') {
+      const targetStart = linkText.nextIndex + 1;
+      let target = '';
+      let depth = 0;
+      let capturingTarget = true;
+      let cursor = targetStart;
+
+      while (cursor < content.length) {
+        const character = content[cursor];
+        if (character === '\\' && cursor + 1 < content.length) {
+          if (capturingTarget) {
+            target += content[cursor + 1];
+          }
+          cursor += 2;
+          continue;
+        }
+        if (character === '(') {
+          depth += 1;
+          if (capturingTarget) {
+            target += character;
+          }
+          cursor += 1;
+          continue;
+        }
+        if (character === ')') {
+          if (depth === 0) {
+            break;
+          }
+          depth -= 1;
+          if (capturingTarget) {
+            target += character;
+          }
+          cursor += 1;
+          continue;
+        }
+        if (capturingTarget && /\s/.test(character) && depth === 0) {
+          capturingTarget = false;
+          cursor += 1;
+          continue;
+        }
+        if (capturingTarget) {
+          target += character;
+        }
+        cursor += 1;
+      }
+
+      if (content[cursor] === ')' && target.trim().length > 0) {
+        links.push(target.trim().replace(/^<|>$/g, ''));
+      }
+      index = linkText.nextIndex;
+      continue;
+    }
+
+    if (nextCharacter === '[') {
+      const reference = readBracketedText(content, linkText.nextIndex);
+      if (!reference) {
+        continue;
+      }
+
+      const label = reference.value.length === 0 ? linkText.value : reference.value;
+      const target = definitions.get(normalizeReferenceLabel(label));
+      if (target) {
+        links.push(target);
+      }
+      index = reference.nextIndex - 1;
+    }
   }
   return links;
 }
