@@ -52,6 +52,9 @@ commands.
 
 ## Validation
 
+Requires Node.js 20 or newer. There are no package dependencies to install for
+the current validator.
+
 Run:
 
 ```bash
