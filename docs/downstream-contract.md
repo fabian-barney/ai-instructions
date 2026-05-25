@@ -45,7 +45,7 @@ The downstream project context should use this structure:
 ```text
 ai/PROJECT/
 |-- AI.md
-|-- SKILLS.yml
+|-- SKILLS.json
 |-- DECISIONS/
 |   |-- DECISIONS.md
 |   `-- ADR-0001-template.md

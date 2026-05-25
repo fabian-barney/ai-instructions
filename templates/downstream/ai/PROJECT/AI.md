@@ -4,7 +4,7 @@ This file is the downstream project-owned AI context entrypoint.
 
 ## Skill Profile
 
-- [SKILLS.yml](SKILLS.yml)
+- [SKILLS.json](SKILLS.json)
 
 ## Project Knowledge
 
@@ -15,4 +15,4 @@ This file is the downstream project-owned AI context entrypoint.
 ## Local Guidance
 
 Add only project-specific context here. Reusable behavior should stay in shared
-skill catalogs or instruction libraries and be filtered through `SKILLS.yml`.
+skill catalogs or instruction libraries and be filtered through `SKILLS.json`.

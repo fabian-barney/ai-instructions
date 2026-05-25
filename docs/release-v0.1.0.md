@@ -7,7 +7,7 @@ Use this checklist before tagging the first release.
 - Run `npm run validate`.
 - Confirm there is no root-level `ai/PROJECT` directory in this repository.
 - Confirm no `GEMINI.md` template or docs contract exists.
-- Confirm `templates/downstream/ai/PROJECT/SKILLS.yml` parses as manifest
+- Confirm `templates/downstream/ai/PROJECT/SKILLS.json` parses as manifest
   version `1`.
 - Confirm all downstream project Markdown templates are reachable from
   `templates/downstream/ai/PROJECT/AI.md`.
