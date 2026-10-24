@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Run CI validation on maintained Node.js 24 LTS while retaining the Node.js 20
+  technical minimum.
+
 ## v0.1.0 - 2026-05-25
 
 - Define `ai-instructions` as a tiny downstream-only instruction layer.

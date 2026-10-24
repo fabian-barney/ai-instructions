@@ -6,7 +6,7 @@ rule catalog.
 
 ## Local Checks
 
-- Use Node.js 20 or newer.
+- Use Node.js 24 LTS for local checks; the technical minimum remains Node.js 20.
 - Run `npm run validate`.
 - Run `npm test`.
 
