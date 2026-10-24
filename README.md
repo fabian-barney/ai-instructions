@@ -54,6 +54,7 @@ commands.
 
 Requires Node.js 20 or newer. There are no package dependencies to install for
 the current validator.
+CI validates on maintained Node.js 24 LTS; older runtimes are unverified.
 
 Run:
 
